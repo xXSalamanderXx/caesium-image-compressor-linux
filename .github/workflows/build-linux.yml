@@ -1,10 +1,10 @@
 name: Linux Builds (AppImage & DEB)
 
 on:
-  workflow_dispatch: # Allows manual triggering
+  workflow_dispatch:
   push:
     tags:
-      - 'v*' # Creates a public release when you push a version tag
+      - 'v*'
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
@@ -79,15 +79,17 @@ jobs:
           
           export VERSION=$(git describe --tags --always || echo "latest")
           
-          # ANTICIPATED FIX 1: Force system to recognize our custom libcaesium.so location
+          # Force system to recognize our custom libcaesium.so location
           export LD_LIBRARY_PATH=$(pwd)/AppDir/usr/lib:$LD_LIBRARY_PATH
           
-          # ANTICIPATED FIX 2: Hardcode Qt paths so the plugin cannot lose track of them
-          export PATH=$Qt6_DIR/bin:$PATH
-          export QMAKE=$Qt6_DIR/bin/qmake
+          # FIX: Dynamically locate qmake (checking both qmake6 and qmake just in case)
+          export QMAKE=$(which qmake6 || which qmake)
+          echo "Discovered precise qmake path at: $QMAKE"
+          
+          # Tell Qt plugin to include necessary image formatting libraries
           export EXTRA_QT_PLUGINS=imageformats
           
-          # ANTICIPATED FIX 3: Explicitly map the library, desktop file, and icon into the builder
+          # Explicitly map the library, desktop file, and icon into the builder
           ./linuxdeploy-x86_64.AppImage \
             --appdir AppDir \
             -l AppDir/usr/lib/libcaesium.so \
