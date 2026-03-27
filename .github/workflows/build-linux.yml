@@ -1,0 +1,77 @@
+name: Linux Builds (AppImage & DEB)
+
+on:
+  workflow_dispatch: # Allows you to manually trigger a build
+  schedule:
+    - cron: '0 0 * * 0' # Optional: Checks for updates weekly (Sunday at midnight)
+  push:
+    tags:
+      - 'v*' # Triggers automatically if you push a version tag
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive # Important if libcaesium is a submodule
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake fuse libfuse2 desktop-file-utils libgl1-mesa-dev libxcb-cursor0
+
+      - name: Install Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Qt6
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: '6.8.0' # Adjust based on upstream requirements
+          host: 'linux'
+          target: 'desktop'
+          modules: 'qtimageformats'
+
+      - name: Build Caesium
+        run: |
+          mkdir build && cd build
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr ..
+          make -j$(nproc)
+
+      - name: Create AppImage
+        run: |
+          # Download linuxdeployqt
+          wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+          chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+          
+          # Prepare AppDir
+          make -C build install DESTDIR=$(pwd)/AppDir
+          
+          # Ensure desktop file and icon are in place for AppImage
+          # (Modify paths if Caesium stores them in different directories)
+          cp resources/caesium.desktop AppDir/usr/share/applications/ || true
+          cp resources/icons/caesium.png AppDir/usr/share/icons/hicolor/512x512/apps/ || true
+          
+          export VERSION=$(git describe --tags --always)
+          ./linuxdeployqt-continuous-x86_64.AppImage AppDir/usr/share/applications/caesium.desktop -appimage -unsupported-allow-new-glibc
+          
+      - name: Create DEB Package
+        run: |
+          cd build
+          # If the upstream CMakeLists.txt supports CPack:
+          cpack -G DEB || echo "CPack not configured, skipping DEB."
+          
+          # If CPack isn't configured, you can build a DEB using checkinstall:
+          # sudo apt-get install -y checkinstall
+          # sudo checkinstall -y --pkgname=caesium --pkgversion=$VERSION --nodoc make install
+
+      - name: Upload Release Artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            *.AppImage
+            build/*.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
