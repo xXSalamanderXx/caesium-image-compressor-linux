@@ -49,9 +49,7 @@ jobs:
           wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
           chmod a+x linuxdeployqt-continuous-x86_64.AppImage
           
-          # FIX: The upstream code tries to write a symlink to /usr/lib directly.
-          # We temporarily give the runner user write access to /usr/lib so we 
-          # DO NOT have to use sudo. This keeps our Rust environment perfectly intact!
+          # Temporarily give the runner user write access to /usr/lib to bypass the Rust symlink bug
           sudo chmod 777 /usr/lib
           
           # Install to AppDir without sudo
@@ -76,8 +74,18 @@ jobs:
           Categories=Graphics;Photography;
           EOF
           
-          # Dynamically create a placeholder logo
-          convert -size 256x256 xc:#2196F3 -gravity center -pointsize 40 -fill white -annotate +0+0 "Caesium" AppDir/usr/share/icons/hicolor/256x256/apps/caesium.png
+          # Add the real icon from the repository, with a safe fallback just in case
+          if [ -f "resources/caesium.png" ]; then
+            echo "Found resources/caesium.png! Copying to AppImage..."
+            cp resources/caesium.png AppDir/usr/share/icons/hicolor/256x256/apps/caesium.png
+          elif [ -f "resources/icons/caesium.png" ]; then
+            # Just in case it's in the icons subfolder
+            echo "Found resources/icons/caesium.png! Copying to AppImage..."
+            cp resources/icons/caesium.png AppDir/usr/share/icons/hicolor/256x256/apps/caesium.png
+          else
+            echo "Could not find caesium.png in the repo. Generating safe fallback placeholder..."
+            convert -size 256x256 xc:#2196F3 AppDir/usr/share/icons/hicolor/256x256/apps/caesium.png
+          fi
           
           export VERSION=$(git describe --tags --always || echo "latest")
           
