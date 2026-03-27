@@ -1,35 +1,37 @@
 name: Linux Builds (AppImage & DEB)
 
 on:
-  workflow_dispatch: # Allows you to manually trigger a build
-  schedule:
-    - cron: '0 0 * * 0' # Optional: Checks for updates weekly (Sunday at midnight)
+  workflow_dispatch: # Allows manual triggering
   push:
     tags:
-      - 'v*' # Triggers automatically if you push a version tag
+      - 'v*' # Creates a public release when you push a version tag
+
+# This silences the Node.js 20 deprecation warning you saw
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: recursive # Important if libcaesium is a submodule
+          submodules: recursive
 
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake fuse libfuse2 desktop-file-utils libgl1-mesa-dev libxcb-cursor0
+          sudo apt-get install -y build-essential cmake fuse libfuse2 desktop-file-utils libgl1-mesa-dev libxcb-cursor0 checkinstall
 
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
 
       - name: Install Qt6
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
         with:
-          version: '6.8.0' # Adjust based on upstream requirements
+          version: '6.8.0'
           host: 'linux'
           target: 'desktop'
           modules: 'qtimageformats'
@@ -42,33 +44,49 @@ jobs:
 
       - name: Create AppImage
         run: |
-          # Download linuxdeployqt
+          # Download linuxdeployqt tool
           wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
           chmod a+x linuxdeployqt-continuous-x86_64.AppImage
           
-          # Prepare AppDir
+          # Install to a temporary AppDir directory
           make -C build install DESTDIR=$(pwd)/AppDir
           
-          # Ensure desktop file and icon are in place for AppImage
-          # (Modify paths if Caesium stores them in different directories)
-          cp resources/caesium.desktop AppDir/usr/share/applications/ || true
-          cp resources/icons/caesium.png AppDir/usr/share/icons/hicolor/512x512/apps/ || true
+          # Ensure desktop file and icon exist for the AppImage builder
+          mkdir -p AppDir/usr/share/applications/ AppDir/usr/share/icons/hicolor/512x512/apps/
+          cp resources/caesium.desktop AppDir/usr/share/applications/ || echo "Desktop file not found"
+          cp resources/icons/caesium.png AppDir/usr/share/icons/hicolor/512x512/apps/ || echo "Icon not found"
           
-          export VERSION=$(git describe --tags --always)
+          export VERSION=$(git describe --tags --always || echo "latest")
           ./linuxdeployqt-continuous-x86_64.AppImage AppDir/usr/share/applications/caesium.desktop -appimage -unsupported-allow-new-glibc
           
+          # Rename the AppImage to make it easy to find
+          mv Caesium*.AppImage caesium-image-compressor-linux-x86_64.AppImage || true
+
       - name: Create DEB Package
         run: |
           cd build
-          # If the upstream CMakeLists.txt supports CPack:
-          cpack -G DEB || echo "CPack not configured, skipping DEB."
+          export VERSION=$(git describe --tags --always || echo "1.0.0")
           
-          # If CPack isn't configured, you can build a DEB using checkinstall:
-          # sudo apt-get install -y checkinstall
-          # sudo checkinstall -y --pkgname=caesium --pkgversion=$VERSION --nodoc make install
+          # Try using CPack first (if upstream supports it)
+          cpack -G DEB || true
+          
+          # If CPack didn't generate a DEB, use checkinstall as a guaranteed fallback
+          if ! ls *.deb 1> /dev/null 2>&1; then
+            echo "Using checkinstall to generate DEB..."
+            sudo checkinstall -y --pkgname=caesium-image-compressor --pkgversion=$VERSION --nodoc make install
+          fi
 
-      - name: Upload Release Artifacts
-        uses: softprops/action-gh-release@v1
+      - name: Save Artifacts (For Manual Runs)
+        uses: actions/upload-artifact@v4
+        with:
+          name: caesium-linux-builds
+          path: |
+            *.AppImage
+            build/*.deb
+
+      - name: Upload Release Artifacts (For Tag Pushes)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
         with:
           files: |
             *.AppImage
