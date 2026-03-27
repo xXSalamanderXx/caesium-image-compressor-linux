@@ -49,18 +49,38 @@ jobs:
           wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
           chmod a+x linuxdeployqt-continuous-x86_64.AppImage
           
-          # Install to a temporary AppDir directory
-          make -C build install DESTDIR=$(pwd)/AppDir
+          # FIX 1: Use sudo to bypass the libcaesium absolute symlink permission bug
+          sudo make -C build install DESTDIR=$(pwd)/AppDir
           
-          # Ensure desktop file and icon exist for the AppImage builder
-          mkdir -p AppDir/usr/share/applications/ AppDir/usr/share/icons/hicolor/512x512/apps/
-          cp resources/caesium.desktop AppDir/usr/share/applications/ || echo "Desktop file not found"
-          cp resources/icons/caesium.png AppDir/usr/share/icons/hicolor/512x512/apps/ || echo "Icon not found"
+          # Fix ownership back to the runner user after using sudo
+          sudo chown -R $USER:$USER AppDir
+          
+          # FIX 2: Create the missing Linux directories
+          mkdir -p AppDir/usr/share/applications/
+          mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps/
+          
+          # Dynamically create the missing .desktop file
+          cat <<EOF > AppDir/usr/share/applications/caesium.desktop
+          [Desktop Entry]
+          Type=Application
+          Name=Caesium Image Compressor
+          Comment=Batch image compression tool
+          Exec=caesium-image-compressor %F
+          Icon=caesium
+          Terminal=false
+          Categories=Graphics;Photography;
+          EOF
+          
+          # Dynamically create a placeholder logo so the AppImage builder doesn't crash
+          # (It draws a blue square with the word "Caesium" in the center)
+          convert -size 256x256 xc:#2196F3 -gravity center -pointsize 40 -fill white -annotate +0+0 "Caesium" AppDir/usr/share/icons/hicolor/256x256/apps/caesium.png
           
           export VERSION=$(git describe --tags --always || echo "latest")
+          
+          # Bundle everything into the final AppImage!
           ./linuxdeployqt-continuous-x86_64.AppImage AppDir/usr/share/applications/caesium.desktop -appimage -unsupported-allow-new-glibc
           
-          # Rename the AppImage to make it easy to find
+          # Rename to something clean
           mv Caesium*.AppImage caesium-image-compressor-linux-x86_64.AppImage || true
 
       - name: Create DEB Package
@@ -68,13 +88,17 @@ jobs:
           cd build
           export VERSION=$(git describe --tags --always || echo "1.0.0")
           
-          # Try using CPack first (if upstream supports it)
           cpack -G DEB || true
           
-          # If CPack didn't generate a DEB, use checkinstall as a guaranteed fallback
+          # If CPack didn't generate a DEB, use checkinstall as a fallback
           if ! ls *.deb 1> /dev/null 2>&1; then
             echo "Using checkinstall to generate DEB..."
-            sudo checkinstall -y --pkgname=caesium-image-compressor --pkgversion=$VERSION --nodoc make install
+            
+            # Provide a default description to prevent checkinstall from freezing and waiting for user input
+            echo "Caesium Image Compressor" > description-pak
+            
+            # Run checkinstall with sudo to bypass the same symlink permission error
+            sudo checkinstall -y --pkgname=caesium-image-compressor --pkgversion=$VERSION --nodoc --maintainer="GitHub Actions" make install
           fi
 
       - name: Save Artifacts (For Manual Runs)
