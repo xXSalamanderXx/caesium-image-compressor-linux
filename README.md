@@ -1,144 +1,96 @@
-## Caesium Image Compressor  [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/Lymphatus)
+# Caesium Image Compressor - Linux
 
-[![Build](https://github.com/Lymphatus/caesium-image-compressor/actions/workflows/build-qt.yml/badge.svg)](https://github.com/Lymphatus/caesium-image-compressor/actions/workflows/build-qt.yml)
+[![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://buymeacoffee.com/SinZZzz)
 
-Try it directly on browser at [caesium.app](https://caesium.app)
+[![Release](https://img.shields.io/github/v/release/xXSalamanderXx/caesium-image-compressor-linux?style=for-the-badge)](https://github.com/xXSalamanderXx/caesium-image-compressor-linux/releases) [![Top language](https://img.shields.io/github/languages/top/xXSalamanderXx/caesium-image-compressor-linux?style=for-the-badge)](https://github.com/xXSalamanderXx/caesium-image-compressor-linux) [![License](https://img.shields.io/github/license/xXSalamanderXx/caesium-image-compressor-linux?style=for-the-badge)](./LICENSE)
 
-> [!NOTE]
-> I'm starting to work to the v3.0.0 version to address a lot of suggestions, feature requests and general improvements. You can participate in the development in this [discussion thread](https://github.com/Lymphatus/caesium-image-compressor/issues/334).
+**This fork produces standalone Linux builds directly from upstream.** The original Caesium repository focuses heavily on Windows and macOS. This fork exists solely to provide Linux users with a reliable `.AppImage` so they can easily run the latest versions without compiling from source. 
 
-###### v2.8.5
-
+### 📦 Latest Upstream Version: v2.8.5
 ![caesium_screenshot_280](https://github.com/user-attachments/assets/e5a6510a-58c5-4349-8563-f4e3ee84d5a0)
 
-### Special Thanks
+*(Try Caesium directly in your browser at [caesium.app](https://caesium.app))*
 
-<a href="https://github.com/7eventech77"><img src="https://github.com/7eventech77.png" width="30px" alt="7eventech77" style="border-radius: 100%;" /></a>
-<a href="https://github.com/ClearRabbit"><img src="https://github.com/ClearRabbit.png" width="30px" alt="ClearRabbit" style="border-radius: 100%;" /></a>
-<a href="https://github.com/LushawnDev"><img src="https://github.com/LushawnDev.png" width="30px" alt="LushawnDev" style="border-radius: 100%;" /></a>
-<a href="https://github.com/yannkost"><img src="https://github.com/yannkost.png" width="30px" alt="yannkost" style="border-radius: 100%;" /></a>
-<a href="https://github.com/yannkost"><img src="https://github.com/stamminator.png" width="30px" alt="stamminator" style="border-radius: 100%;" /></a>
-<a href="https://github.com/justBernhard"><img src="https://github.com/justBernhard.png" width="30px" alt="justBernhard" style="border-radius: 100%;" /></a>
+---
 
-----------
+## 🚀 How to Install and Run on Linux
 
-### What is it for
+Head to the [Releases Page](https://github.com/xXSalamanderXx/caesium-image-compressor-linux/releases) to download the latest `.AppImage`.
 
-Caesium is an image compression software that helps you store, send and share digital pictures, supporting JPG, PNG and
-WebP formats.
-You can quickly reduce the file size (and resolution, if you want) by preserving the overall quality of the image.
+An `.AppImage` is a universal package that runs on almost any Linux distribution without requiring complex dependency installations. You have two ways to use it:
 
-### Supported Platforms
+### Method 1: Proper System Integration (Recommended)
+For the best desktop experience, we highly recommend using [AppImageLauncher](https://github.com/TheAssassin/AppImageLauncher). 
 
-- **Windows**: 10 (build 1809 or later) (use old version v1.x for Windows 7 or
-  8 - [link](https://www.fosshub.com/Caesium-Image-Compressor-old.html))
-- **MacOS**: 12+
-- **Linux**: tested on Ubuntu 22.04 and Manjaro
+Once AppImageLauncher is installed on your system, simply double-click the downloaded Caesium `.AppImage` file. It will automatically integrate Caesium into your system, adding the icon right to your application menu and launcher, just like a natively installed app!
 
-Note: only 64bit versions are supported
+### Method 2: Manual Execution
+If you prefer to run it as a portable app without integrating it into your system menus, you can do so manually:
+1. **Download** the `.AppImage` file attached to the latest release.
+2. **Make it executable:** * **GUI:** Right-click the downloaded file -> select **Properties** -> go to the **Permissions** tab -> check the box that says **"Allow executing file as program"**.
+   * **Terminal:** Open your terminal in the download folder and run:
+     `chmod +x caesium-image-compressor-linux-x86_64.AppImage`
+3. **Run the App:** Double-click the file to open Caesium and start batch-compressing your images.
 
-### Installation
+*(Note: For Windows or macOS downloads, please visit the [Original Upstream Repository](https://github.com/Lymphatus/caesium-image-compressor)).*
 
-Head to the [releases' page](https://github.com/Lymphatus/caesium-image-compressor/releases) for the available
-downloads.
+---
 
-- **Windows**: installer and portable versions are available
-- **MacOS**: DMG package
-- **Linux**: compile the source code yourself, or download binary
-  from [third-party build](https://github.com/larygwil/caesium-image-compressor/releases)
+## 📸 What is Caesium?
 
-Note that the main branch can contain unstable code. If you want to build on a stable version, use a tagged version.
+Caesium is an image compression software that helps you store, send, and share digital pictures, supporting JPG, PNG, and WebP formats. You can quickly reduce the file size (and resolution, if you want) by preserving the overall quality of the image.
 
-### Troubleshooting and/or feature request
+### Troubleshooting / Feature Requests
+Since this fork only handles the Linux packaging, any bugs regarding the actual software should be reported to the original developer. Please open an [issue on the upstream repo](https://github.com/Lymphatus/caesium-image-compressor/issues).
 
-Please open an [issue](https://github.com/Lymphatus/caesium-image-compressor/issues).
+---
 
-### Build from source
+## 🙌 Credit
 
-##### Requirements
+Full credit for the creation, development, and maintenance of Caesium Image Compressor goes to **[Lymphatus](https://github.com/Lymphatus)** and the contributors of the [original upstream repository](https://github.com/Lymphatus/caesium-image-compressor). 
 
-- [Rust](https://www.rust-lang.org/tools/install): required to
-  compile [libcaesium](https://github.com/Lymphatus/libcaesium). Make sure you have `cargo` executable on you `$PATH`
-- [Qt6 SDK](https://www.qt.io/download/): binaries are built on 6.8.0 (open source)
-- [libssh](https://www.libssh.org/): macOS only
-- [Sparkle](https://sparkle-project.org/): macOS only. Only version 1.27.1 is supported.
+This fork is strictly an automated build pipeline to bring their hard work to Linux users.
 
-#### Build
+---
 
-##### Step 0 (macOS Only)
+<p align="center">
+  <b>⭐ Star the repo • ☕ Support development • 🚀 Explore more projects</b>
+</p>
 
-You need to set up Sparkle in order to compile the project
+## ⭐ Show Your Support
 
-```
-brew install --cask https://raw.githubusercontent.com/Homebrew/homebrew-cask/c6dfe6baf1639998ba1707f68668cf8fa97bac9d/Casks/sparkle.rb
-sudo cp -R /usr/local/Caskroom/sparkle/1.27.1/Sparkle.framework /Library/Frameworks/Sparkle.framework
-```
+If this repo has helped you, please consider giving it a **star** on GitHub!  
+It really helps show support, motivates future updates, and encourages continued development. 🚀
 
-##### Step 1
+Every ⭐ makes a difference and means a lot. Thanks for helping this project grow! 🙌
 
-You need to configure CMake first and the command is slightly different for all the platforms:
-Change the path in variables with the correct directories of the requirements.
+## ☕ Support Development
 
-###### Windows
+If you'd like to support my work even more, you can **buy me a coffee** here:  
+[☕ buymeacoffee.com/SinZZzz](https://buymeacoffee.com/SinZZzz)
 
-```
-cmake -B build_dir -DCMAKE_PREFIX_PATH=/path/to/Qt/version -G "MinGW Makefiles"
-```
+Your support helps keep development active and appreciated. 💙
 
-###### MacOS
+## 🔍 Check Out My Other Repos
 
-```
-cmake -B build_dir -DCMAKE_PREFIX_PATH=/path/to/Qt/version/macos -DLIBSSH_INCLUDE_DIR=/libssh/dir/include -DSPARKLE_INCLUDE_DIR=/usr/local/Caskroom/sparkle/1.27.1/Sparkle.framework/Versions/Current/Headers
-```
+You might also like these projects:
 
-###### Linux
+- [🔎 RLSBB-Search-Plus](https://github.com/xXSalamanderXx/RLSBB-Search-Plus)
+- [🎬 HDEncode-Search-Plus](https://github.com/xXSalamanderXx/HDEncode-Search-Plus)
+- [🦁 SlimBrave](https://github.com/xXSalamanderXx/SlimBrave)
+- [🦎 salamander-trackers](https://github.com/xXSalamanderXx/salamander-trackers)
 
-Make sure you have all the requirements installed with you own package manager
+---
 
-```
-cmake -B build_dir -DCMAKE_PREFIX_PATH=/path/to/Qt/version/gcc_64
-```
+## Disclaimer
 
-##### Step 2
+This project is provided as-is, with no guarantees or warranties of any kind.
 
-Then you can build with
+You are responsible for how you use the contents of this repository and for making sure your usage complies with any applicable laws, rules, or policies.
 
-```
-cmake --build build_dir --config Release --target caesium_image_compressor
-```
+The author and contributors are not liable for any claims, damages, or other issues arising from the use of this project.
 
-### Languages and translations
+## License 📄
 
-The 1.0 version of Caesium had a lot of community made translations, but this 2.0 release has a whole new set of strings
-and no old translations can be used anymore.
-Caesium 2.0 is currently available in:
-
-| Language                                                                           | Progress |
-|------------------------------------------------------------------------------------|----------|
-| <img src="https://flagcdn.com/48x36/eg.png" width="24" height="18" alt="EG"> ar_EG | 77%      |
-| <img src="https://flagcdn.com/48x36/de.png" width="24" height="18" alt="DE"> de_DE | 72%      |
-| <img src="https://flagcdn.com/48x36/gr.png" width="24" height="18" alt="GR"> el_GR | 69%      |
-| <img src="https://flagcdn.com/48x36/us.png" width="24" height="18" alt="US"> en_US | 100%     |
-| <img src="https://flagcdn.com/48x36/es.png" width="24" height="18" alt="ES"> es_ES | 67%      |
-| <img src="https://flagcdn.com/48x36/ir.png" width="24" height="18" alt="IR"> fa_IR | 98%      |
-| <img src="https://flagcdn.com/48x36/fi.png" width="24" height="18" alt="FI"> fi_FI | 72%      |
-| <img src="https://flagcdn.com/48x36/fr.png" width="24" height="18" alt="FR"> fr_FR | 68%      |
-| <img src="https://flagcdn.com/48x36/in.png" width="24" height="18" alt="IN"> hi_IN | 72%      |
-| <img src="https://flagcdn.com/48x36/id.png" width="24" height="18" alt="ID"> id_ID | 69%      |
-| <img src="https://flagcdn.com/48x36/it.png" width="24" height="18" alt="IT"> it_IT | 100%     |
-| <img src="https://flagcdn.com/48x36/jp.png" width="24" height="18" alt="JP"> ja_JP | 97%      |
-| <img src="https://flagcdn.com/48x36/pl.png" width="24" height="18" alt="PL"> pl_PL | 69%      |
-| <img src="https://flagcdn.com/48x36/br.png" width="24" height="18" alt="BR"> pt_BR | 95%      |
-| <img src="https://flagcdn.com/48x36/ru.png" width="24" height="18" alt="RU"> ru_RU | 97%      |
-| <img src="https://flagcdn.com/48x36/sk.png" width="24" height="18" alt="SK"> sk_SK | 68%      |
-| <img src="https://flagcdn.com/48x36/tr.png" width="24" height="18" alt="TR"> tr_TR | 97%      |
-| <img src="https://flagcdn.com/48x36/cn.png" width="24" height="18" alt="CN"> zh_CN | 100%     |
-| <img src="https://flagcdn.com/48x36/tw.png" width="24" height="18" alt="TW"> zh_TW | 100%     |
-
-#### How to contribute with your translation
-
-You can help translate by opening the `resources/i18n/caesium_en_US.ts` with QtLinguist or any XML editor. Rename it to
-your language (e.g. `caesium_it_IT.ts`) and translate all the sentences. Then you can start a pull request with your
-translated file.
-See [this pull request](https://github.com/Lymphatus/caesium-image-compressor/pull/106) as an example.
-Thanks to all the people who contributed.
+Licensed under the **GPL-3.0** license.  
+See the full license here: [GPL-3.0 License](https://github.com/Lymphatus/caesium-image-compressor/blob/main/LICENSE)
