@@ -265,3 +265,12 @@ endif ()
 
 add_subdirectory(tests)
 add_test(NAME CsTests COMMAND CsTests)
+
+# --- CPack Configuration for .deb ---
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_NAME "caesium-image-compressor")
+set(CPACK_PACKAGE_VERSION "2.8.5") # Update to match upstream
+set(CPACK_PACKAGE_CONTACT "Your Name <your.email@example.com>")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Your Name")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6, libstdc++6, libxcb-cursor0") 
+include(CPack)
