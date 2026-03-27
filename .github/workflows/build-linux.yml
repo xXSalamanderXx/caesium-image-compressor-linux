@@ -6,7 +6,7 @@ on:
     tags:
       - 'v*' # Creates a public release when you push a version tag
 
-# This silences the Node.js 20 deprecation warning
+# Silences the Node.js 20 deprecation warning
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true 
 
@@ -23,7 +23,8 @@ jobs:
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake fuse libfuse2 desktop-file-utils libgl1-mesa-dev libxcb-cursor0 checkinstall
+          # Added 'file' dependency which linuxdeploy relies on to inspect binaries
+          sudo apt-get install -y build-essential cmake fuse libfuse2 desktop-file-utils libgl1-mesa-dev libxcb-cursor0 checkinstall file
 
       - name: Install Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -45,17 +46,14 @@ jobs:
 
       - name: Create AppImage
         run: |
-          # Download linuxdeployqt tool
-          wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-          chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+          # Use the modern linuxdeploy toolset which actually supports Qt6 packaging
+          wget -c -nv "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
+          wget -c -nv "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage"
+          chmod a+x linuxdeploy*.AppImage
           
           # Temporarily give the runner user write access to /usr/lib to bypass the Rust symlink bug
           sudo chmod 777 /usr/lib
-          
-          # Install to AppDir without sudo
           make -C build install DESTDIR=$(pwd)/AppDir
-          
-          # Revert permissions to be safe
           sudo chmod 755 /usr/lib
           
           # Create the missing Linux directories for the AppImage
@@ -74,33 +72,33 @@ jobs:
           Categories=Graphics;Photography;
           EOF
           
-          # Add the real icon from the repository, with a safe fallback just in case
+          # Copy the real icon from the repository (with safe fallback)
           if [ -f "resources/caesium.png" ]; then
-            echo "Found resources/caesium.png! Copying to AppImage..."
             cp resources/caesium.png AppDir/usr/share/icons/hicolor/256x256/apps/caesium.png
           elif [ -f "resources/icons/caesium.png" ]; then
-            # Just in case it's in the icons subfolder
-            echo "Found resources/icons/caesium.png! Copying to AppImage..."
             cp resources/icons/caesium.png AppDir/usr/share/icons/hicolor/256x256/apps/caesium.png
           else
-            echo "Could not find caesium.png in the repo. Generating safe fallback placeholder..."
             convert -size 256x256 xc:#2196F3 AppDir/usr/share/icons/hicolor/256x256/apps/caesium.png
           fi
           
           export VERSION=$(git describe --tags --always || echo "latest")
           
-          # Bundle everything into the final AppImage
-          ./linuxdeployqt-continuous-x86_64.AppImage AppDir/usr/share/applications/caesium.desktop -appimage -unsupported-allow-new-glibc
+          # Tell linuxdeploy exactly where to find our Qt6 installation and explicitly include image plugins
+          export QMAKE=$Qt6_DIR/bin/qmake
+          export EXTRA_QT_PLUGINS=imageformats
           
-          # Rename the AppImage to make it easy to find
-          mv Caesium*.AppImage caesium-image-compressor-linux-x86_64.AppImage || true
+          # Bundle everything into the final AppImage using the modern Qt plugin
+          ./linuxdeploy-x86_64.AppImage --appdir AppDir --plugin qt --output appimage
+          
+          # Find the generated AppImage and rename it cleanly (ignores the tool AppImages)
+          find . -maxdepth 1 -name "Caesium_Image_Compressor*.AppImage" -exec mv {} caesium-image-compressor-linux-x86_64.AppImage \; || true
 
       - name: Create DEB Package
         run: |
           cd build
           export VERSION=$(git describe --tags --always || echo "1.0.0")
           
-          # Try using CPack first (Caesium seems to support this natively)
+          # Try using CPack first 
           cpack -G DEB || true
           
           # If CPack didn't generate a DEB, use checkinstall as a fallback
@@ -108,7 +106,7 @@ jobs:
             echo "Using checkinstall to generate DEB..."
             echo "Caesium Image Compressor" > description-pak
             
-            # Pass PATH and HOME to sudo so Rust is still found if checkinstall triggers a rebuild
+            # Pass PATH and HOME to sudo so Rust is still found
             sudo env "PATH=$PATH" "HOME=$HOME" checkinstall -y --pkgname=caesium-image-compressor --pkgversion=$VERSION --nodoc --maintainer="GitHub Actions" make install
           fi
 
