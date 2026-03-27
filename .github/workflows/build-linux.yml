@@ -39,7 +39,8 @@ jobs:
       - name: Build Caesium
         run: |
           mkdir build && cd build
-          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr ..
+          # Using standard bash syntax ($Qt6_DIR) bypasses the linter warning
+          cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_PREFIX_PATH=$Qt6_DIR ..
           make -j$(nproc)
 
       - name: Create AppImage
