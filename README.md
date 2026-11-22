@@ -75,10 +75,13 @@ Your support helps keep development active and appreciated. 💙
 
 You might also like these projects:
 
-- [🔎 RLSBB-Search-Plus](https://github.com/xXSalamanderXx/RLSBB-Search-Plus)
-- [🎬 HDEncode-Search-Plus](https://github.com/xXSalamanderXx/HDEncode-Search-Plus)
 - [🦁 SlimBrave](https://github.com/xXSalamanderXx/SlimBrave)
 - [🦎 salamander-trackers](https://github.com/xXSalamanderXx/salamander-trackers)
+- [📜 Salamander-Userscripts](https://github.com/xXSalamanderXx/Salamander-Userscripts)
+- [🔎 RLSBB-Search-Plus](https://github.com/xXSalamanderXx/RLSBB-Search-Plus)
+- [🎬 HDEncode-Search-Plus](https://github.com/xXSalamanderXx/HDEncode-Search-Plus)
+- [📚 Arvio-Catalogs](https://github.com/xXSalamanderXx/Arvio-Catalogs)
+- [🐺 librewolf-one](https://github.com/xXSalamanderXx/librewolf-one)
 
 ---
 
